@@ -1,0 +1,11 @@
+plotly
+dash-core-components
+dash-html-components
+dash-renderer
+dash
+gunicorn
+pandas
+nltk
+requests
+json
+dash_leaflet
