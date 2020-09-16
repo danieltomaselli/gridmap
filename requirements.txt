@@ -7,5 +7,5 @@ gunicorn
 pandas
 nltk
 requests
-json
+# json
 dash_leaflet
