@@ -80,9 +80,9 @@ def update(csc, state):
     return hideout, data, csc, mm["min"], mm["max"]
 
 #usi this to run it in the local host
-#if __name__ == '__main__':
-#    app.run_server()
+if __name__ == '__main__':
+    app.run_server()
 
 #use this to github
 # for deployment, pass app.server (which is the actual flask app) to WSGI etc
-app = dash.Dash()
+#app = dash.Dash()
