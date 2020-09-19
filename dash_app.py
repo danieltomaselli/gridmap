@@ -9,6 +9,9 @@ import numpy as np
 
 from dash.dependencies import Output, Input
 
+app = dash.Dash(__name__)
+server = app.server
+
 # region Data
 df = pd.read_csv('gridcities.csv')
 color_prop = 'population'
