@@ -1,16 +1,14 @@
+import json
+import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State
-import dash
-import plotly.express as px
+import dash_leaflet as dl
+import dash_leaflet.express as dlx
 import pandas as pd
 import numpy as np
 
-import requests
-import nltk
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from collections import Counter
+from dash.dependencies import Output, Input
+
 
 hashtag = 'netflix'
 consumer_key = '5sFcqEobkFobWD6r3L4T5mUiv'
