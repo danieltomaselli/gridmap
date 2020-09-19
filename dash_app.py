@@ -61,14 +61,6 @@ geojson = dl.GeoJSON(data=get_data(default_state), id="geojson", format="geobuf"
 # Create a colorbar.
 colorbar = dl.Colorbar(colorscale=csc_map[default_csc], id="colorbar", width=20, height=150, **minmax)
 
-@app.callback([Output("geojson", "hideout"), Output("geojson", "data"), Output("colorbar", "colorscale"),
-               Output("colorbar", "min"), Output("colorbar", "max")],
-              [Input("dd_csc", "value"), Input("dd_state", "value")])
-def update(csc, state):
-    csc, data, mm = json.loads(csc), get_data(state), get_minmax(state)
-    hideout = dict(colorscale=csc, color_prop=color_prop, popup_prop='city', **mm)
-    return hideout, data, csc, mm["min"], mm["max"]
-
 # Create the app.
 chroma = "https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js"
 app = dash.Dash(external_scripts=[chroma], prevent_initial_callbacks=True)
@@ -77,6 +69,14 @@ app.layout = html.Div([
              style={"position": "relative", "bottom": "80px", "left": "10px", "z-index": "1000", "width": "200px"})
 ], style={'width': '100%', 'height': '150vh', 'margin': "auto", "display": "block", "position": "relative"})
 server = app.server
+
+@app.callback([Output("geojson", "hideout"), Output("geojson", "data"), Output("colorbar", "colorscale"),
+               Output("colorbar", "min"), Output("colorbar", "max")],
+              [Input("dd_csc", "value"), Input("dd_state", "value")])
+def update(csc, state):
+    csc, data, mm = json.loads(csc), get_data(state), get_minmax(state)
+    hideout = dict(colorscale=csc, color_prop=color_prop, popup_prop='city', **mm)
+    return hideout, data, csc, mm["min"], mm["max"]
 
 if __name__ == '__main__':
     app.run_server(debug=True)
