@@ -9,6 +9,43 @@ import numpy as np
 
 from dash.dependencies import Output, Input
 
+
+
+ef get_data(state):
+    df_state = df[df["state_id"] == state]  # pick one state
+    df_state = df_state[['lat', 'lng', 'city', 'population', 'density']]  # drop irrelevant columns
+    df_state = df_state[df_state[color_prop] > 0]  # drop abandoned cities
+    df_state[color_prop] = np.log(df_state[color_prop])  # take log as the values varies A LOT
+    dicts = df_state.to_dict('rows')
+    for item in dicts:
+        item["tooltip"] = item["city"]  # bind tooltip
+        item["popup"] = item["city"]  # bind popup
+        
+    geojson = dlx.dicts_to_geojson(dicts, lon="lng")  # convert to geojson
+    geobuf = dlx.geojson_to_geobuf(geojson)  # convert to geobuf
+    return geobuf
+
+
+def get_minmax(state):
+    df_state = df[df["state_id"] == state]  # pick one state
+    return dict(min=0, max=np.log(df_state[color_prop].max()))
+
+
+# Setup a few color scales.
+csc_map = {"Rainbow": ['red', 'yellow', 'green', 'blue', 'purple'],
+           "Hot": ['yellow', 'red', 'black'],
+           "Viridis": "Viridis"}
+csc_options = [dict(label=key, value=json.dumps(csc_map[key])) for key in csc_map]
+default_csc = "Rainbow"
+dd_csc = dcc.Dropdown(options=csc_options, value=json.dumps(csc_map[default_csc]), id="dd_csc", clearable=False)
+# Setup state options.
+states = df["state_id"].unique()
+state_names = [df[df["state_id"] == state]["state_id"].iloc[0] for state in states]
+state_options = [dict(label=state_names[i], value=state) for i, state in enumerate(states)]
+default_state = "CA"
+dd_state = dcc.Dropdown(options=state_options, value=default_state, id="dd_state", clearable=False)
+
+
 minmax = get_minmax(default_state)
 # Create geojson.
 geojson = dl.GeoJSON(data=get_data(default_state), id="geojson", format="geobuf",
@@ -29,6 +66,14 @@ app.layout = html.Div([
              style={"position": "relative", "bottom": "80px", "left": "10px", "z-index": "1000", "width": "200px"})
 ], style={'width': '100%', 'height': '150vh', 'margin': "auto", "display": "block", "position": "relative"})
 
+
+@app.callback([Output("geojson", "hideout"), Output("geojson", "data"), Output("colorbar", "colorscale"),
+               Output("colorbar", "min"), Output("colorbar", "max")],
+              [Input("dd_csc", "value"), Input("dd_state", "value")])
+def update(csc, state):
+    csc, data, mm = json.loads(csc), get_data(state), get_minmax(state)
+    hideout = dict(colorscale=csc, color_prop=color_prop, popup_prop='city', **mm)
+    return hideout, data, csc, mm["min"], mm["max"]
 
 if __name__ == '__main__':
     app.run_server(debug=True)
