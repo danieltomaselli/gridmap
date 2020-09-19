@@ -9,9 +9,11 @@ import numpy as np
 
 from dash.dependencies import Output, Input
 
+# region Data
+df = pd.read_csv('gridcities.csv')
+color_prop = 'population'
 
-
-ef get_data(state):
+def get_data(state):
     df_state = df[df["state_id"] == state]  # pick one state
     df_state = df_state[['lat', 'lng', 'city', 'population', 'density']]  # drop irrelevant columns
     df_state = df_state[df_state[color_prop] > 0]  # drop abandoned cities
